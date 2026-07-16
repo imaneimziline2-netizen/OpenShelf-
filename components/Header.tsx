@@ -1,29 +1,42 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
-  return (
-    <header className="border-b bg-white">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <h1 className="text-3xl font-serif font-bold text-gray-900">
-          Lumina Library
-        </h1>
+    const pathname = usePathname();
 
-        <nav className="flex items-center gap-8 text-sm">
-          <Link
-            href="/"
-            className="font-semibold border-b-2 border-black pb-1 hover:text-gray-700 transition"
-          >
-            Home
-          </Link>
+    return (
+        <header className="fixed top-0 left-0 z-50 w-full border-b bg-white shadow-sm">
+            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 ">
+                <h1 className="text-3xl font-serif font-bold text-gray-900">
+                    Lumina Library
+                </h1>
 
-          <Link
-            href="/books/create"
-            className="text-gray-600 hover:text-black transition"
-          >
-            Add a Book
-          </Link>
-        </nav>
-      </div>
-    </header>
-  );
+                <nav className="flex items-center gap-8 text-sm ">
+                    <Link
+                        href="/"
+                        className={`pb-1 transition ${
+                            pathname === "/"
+                                ? "border-b-2 border-black font-semibold text-black"
+                                : "text-gray-600 hover:text-black"
+                        }`}
+                    >
+                        Home
+                    </Link>
+
+                    <Link
+                        href="/books/create"
+                        className={`pb-1 transition ${
+                            pathname === "/books/create"
+                                ? "border-b-2 border-black font-semibold text-black"
+                                : "text-gray-600 hover:text-black"
+                        }`}
+                    >
+                        Add a Book
+                    </Link>
+                </nav>
+            </div>
+        </header>
+    );
 }
