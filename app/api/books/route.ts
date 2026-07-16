@@ -15,40 +15,40 @@ export async function GET() {
     }
 }
 export async function POST(request: Request) {
-  try {
-    await connectDB();
+    try {
+        await connectDB();
 
-    const body = await request.json();
+        const body = await request.json();
 
-    const result = bookSchema.safeParse(body);
+        const result = bookSchema.safeParse(body);
 
-    if (!result.success) {
-      return NextResponse.json(
-        {
-          errors: result.error.flatten(),
-        },
-        {
-          status: 400,
+        if (!result.success) {
+            return NextResponse.json(
+                {
+                    errors: result.error.flatten(),
+                },
+                {
+                    status: 400,
+                },
+            );
         }
-      );
+
+        const newBook = await Book.create(result.data);
+
+        return NextResponse.json(newBook, {
+            status: 201,
+        });
+    } catch (error) {
+        console.error("POST ERROR:", error);
+
+        return NextResponse.json(
+            {
+                message: "Erreur serveur",
+                error,
+            },
+            {
+                status: 500,
+            },
+        );
     }
-
-    const newBook = await Book.create(result.data);
-
-    return NextResponse.json(newBook, {
-      status: 201,
-    });
-
-  } catch (error) {
-    console.error(error);
-
-    return NextResponse.json(
-      {
-        message: "Erreur serveur",
-      },
-      {
-        status: 500,
-      }
-    );
-  }
 }
