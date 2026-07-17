@@ -19,7 +19,7 @@ export default function Footer() {
         </div>
 
         <p className="text-sm text-gray-500">
-          © 2024 Lumina Library. All rights reserved.
+          © 2026 Lumina Library. All rights reserved.
         </p>
 
       </div>
