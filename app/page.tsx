@@ -3,9 +3,13 @@
 import { useEffect, useState } from "react";
 import { Book } from "@/types/Book";
 import BookCard from "@/components/BookCard";
+import SearchBar from "@/components/SearchBar";
+import Filter from "@/components/Filter";
 
 export default function Home() {
     const [books, setBooks] = useState<Book[]>([]);
+    const [search, setSearch] = useState("");
+    const [status, setStatus] = useState("all");
 
     useEffect(() => {
         async function fetchBooks() {
@@ -17,6 +21,43 @@ export default function Home() {
         fetchBooks();
     }, []);
 
+    const handleDelete = async (id: string) => {
+        const confirmDelete = window.confirm(
+            "Voulez-vous vraiment supprimer ce livre ?",
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+            const response = await fetch(`/api/books/${id}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            setBooks((prev) => prev.filter((book) => book._id !== id));
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    
+    const filteredBooks = books.filter((book) => {
+        const matchesSearch =
+            book.title.toLowerCase().includes(search.toLowerCase()) ||
+            book.author.toLowerCase().includes(search.toLowerCase()) ||
+            book.isbn.toLowerCase().includes(search.toLowerCase());
+
+        const matchesStatus =
+            status === "all" ||
+            (status === "available" && book.available) ||
+            (status === "borrowed" && !book.available);
+
+        return matchesSearch && matchesStatus;
+    });
+
     return (
         <main className="max-w-7xl mx-auto p-6 pt-20">
             <h1 className="text-5xl font-serif font-bold">Catalogue Lumina</h1>
@@ -26,9 +67,22 @@ export default function Home() {
                 contemporaine.
             </p>
 
+            <div className="pt-15">
+                <Filter
+                search={search}
+                setSearch={setSearch}
+                status={status}
+                setStatus={setStatus}
+            />
+            </div>
+
             <div className="grid grid-cols-4 gap-6 mt-8">
-                {books.map((book) => (
-                    <BookCard key={book._id} book={book} />
+                {filteredBooks.map((book) => (
+                    <BookCard
+                        key={book._id}
+                        book={book}
+                        onDelete={handleDelete}
+                    />
                 ))}
             </div>
         </main>
