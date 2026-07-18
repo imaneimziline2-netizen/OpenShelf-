@@ -1,72 +1,176 @@
+"use client";
+import { Book } from "@/types/Book";
+import { useParams , useRouter  } from "next/navigation";
+import { useEffect, useState } from "react";
+
 export default function EditBookPage() {
-  return (
-    <section className="mx-auto max-w-3xl px-6 py-10 pt-25">
-      <h1 className="mb-6 text-3xl font-bold">
-        Modifier un livre
-      </h1>
+    const [book, setBook] = useState<Book | null>(null);
+    const [formData, setFormData] = useState({
+        title: "",
+        author: "",
+        isbn: "",
+        category: "",
+        publicationYear: "",
+        description: "",
+        available: true,
+    });
 
-      <form className="space-y-5 rounded-lg bg-white p-6 shadow">
-        <div>
-          <label className="mb-2 block font-medium">Titre</label>
-          <input
-            type="text"
-            defaultValue="Le Petit Prince"
-            className="w-full rounded-lg border p-3"
-          />
-        </div>
+    const params = useParams();
+    const id = params.id as string;
 
-        <div>
-          <label className="mb-2 block font-medium">Auteur</label>
-          <input
-            type="text"
-            defaultValue="Antoine de Saint-Exupéry"
-            className="w-full rounded-lg border p-3"
-          />
-        </div>
+    const router = useRouter();
 
-        <div>
-          <label className="mb-2 block font-medium">ISBN</label>
-          <input
-            type="text"
-            defaultValue="9780156013987"
-            className="w-full rounded-lg border p-3"
-          />
-        </div>
+    useEffect(() => {
+        async function fetchBook() {
+            const response = await fetch(`/api/books/${id}`);
 
-        <div>
-          <label className="mb-2 block font-medium">Catégorie</label>
-          <input
-            type="text"
-            defaultValue="Roman"
-            className="w-full rounded-lg border p-3"
-          />
-        </div>
+            const data = await response.json();
 
-        <div>
-          <label className="mb-2 block font-medium">Année</label>
-          <input
-            type="number"
-            defaultValue={1943}
-            className="w-full rounded-lg border p-3"
-          />
-        </div>
+            if (response.ok) {
+                setBook(data);
+            }
+        }
+        fetchBook();
+    }, [id]);
 
-        <div>
-          <label className="mb-2 block font-medium">Description</label>
-          <textarea
-            rows={5}
-            defaultValue="Un grand classique de la littérature."
-            className="w-full rounded-lg border p-3"
-          />
-        </div>
+    useEffect(() => {
+        if (book) {
+            setFormData({
+                title: book.title,
+                author: book.author,
+                isbn: book.isbn,
+                category: book.category,
+                publicationYear: book.publicationYear.toString(),
+                description: book.description,
+                available: book.available,
+            });
+        }
+    }, [book]);
 
-        <button
-          type="submit"
-          className="rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
-        >
-          Enregistrer les modifications
-        </button>
-      </form>
-    </section>
-  );
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+        const { name, value } = e.target;
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch(`/api/books/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    publicationYear: Number(formData.publicationYear),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.message || "Erreur lors de la mise à jour");
+                return;
+            }
+
+            alert("Livre modifié avec succès");
+            router.push(`/books/${id}`);
+        } catch (error) {
+            console.error(error);
+            alert("Erreur serveur");
+        }
+    };
+
+    return (
+        <section className="mx-auto max-w-3xl px-6 py-10 pt-25">
+            <h1 className="mb-6 text-3xl font-bold">Modifier un livre</h1>
+
+            <form
+                className="space-y-5 rounded-lg bg-white p-6 shadow"
+                onSubmit={handleSubmit}
+            >
+                <div>
+                    <label className="mb-2 block font-medium">Titre</label>
+                    <input
+                        type="text"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border p-3"
+                    />
+                </div>
+
+                <div>
+                    <label className="mb-2 block font-medium">Auteur</label>
+                    <input
+                        type="text"
+                        name="author"
+                        value={formData.author}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border p-3"
+                    />
+                </div>
+
+                <div>
+                    <label className="mb-2 block font-medium">ISBN</label>
+                    <input
+                        type="text"
+                        name="isbn"
+                        value={formData.isbn}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border p-3"
+                    />
+                </div>
+
+                <div>
+                    <label className="mb-2 block font-medium">Catégorie</label>
+                    <input
+                        type="text"
+                        name="category"
+                        value={formData.category}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border p-3"
+                    />
+                </div>
+
+                <div>
+                    <label className="mb-2 block font-medium">Année</label>
+                    <input
+                        type="number"
+                        name="publicationYear"
+                        value={formData.publicationYear}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border p-3"
+                    />
+                </div>
+
+                <div>
+                    <label className="mb-2 block font-medium">
+                        Description
+                    </label>
+                    <textarea
+                        name="description"
+                        rows={5}
+                        value={formData.description}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border p-3"
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    className="rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+                >
+                    Enregistrer les modifications
+                </button>
+            </form>
+        </section>
+    );
 }
