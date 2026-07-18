@@ -13,6 +13,8 @@ interface PageProps {
 
 export default function BookDetails({ params }: PageProps) {
     const [book, setBook] = useState<Book | null>(null);
+    const [notFound, setNotFound] = useState(false);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
@@ -22,17 +24,44 @@ export default function BookDetails({ params }: PageProps) {
             const response = await fetch(`/api/books/${id}`);
             const data = await response.json();
 
-            setBook(data);
+            if (!response.ok) {
+                setNotFound(true);
+            } else {
+                setBook(data);
+            }
+
+            setLoading(false);
         }
 
         fetchBook();
     }, [params]);
 
-    if (!book) {
+    if (loading) {
         return (
             <p className="mt-10 text-center text-lg font-medium">
                 Chargement...
             </p>
+        );
+    }
+
+    if (notFound) {
+        return (
+            <main className="flex min-h-[70vh] flex-col items-center justify-center px-6">
+                <h1 className="text-5xl font-bold text-red-600">
+                    Livre introuvable
+                </h1>
+
+                <p className="mt-4 text-gray-600">
+                    Le livre demandé n existe pas ou a été supprimé.
+                </p>
+
+                <Link
+                    href="/"
+                    className="mt-8 rounded-md bg-black px-6 py-3 text-white hover:bg-gray-800"
+                >
+                    Retour au catalogue
+                </Link>
+            </main>
         );
     }
 
@@ -78,28 +107,36 @@ export default function BookDetails({ params }: PageProps) {
 
                     <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-500 text-sm sm:text-base">ISBN</span>
+                            <span className="text-gray-500 text-sm sm:text-base">
+                                ISBN
+                            </span>
                             <span className="font-medium text-sm sm:text-base break-all text-right ml-2">
                                 {book.isbn}
                             </span>
                         </div>
 
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-500 text-sm sm:text-base">Année</span>
+                            <span className="text-gray-500 text-sm sm:text-base">
+                                Année
+                            </span>
                             <span className="font-medium text-sm sm:text-base">
                                 {book.publicationYear}
                             </span>
                         </div>
 
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-500 text-sm sm:text-base">Catégorie</span>
+                            <span className="text-gray-500 text-sm sm:text-base">
+                                Catégorie
+                            </span>
                             <span className="font-medium text-sm sm:text-base">
                                 {book.category}
                             </span>
                         </div>
 
                         <div className="flex justify-between items-center">
-                            <span className="text-gray-500 text-sm sm:text-base">Disponibilité</span>
+                            <span className="text-gray-500 text-sm sm:text-base">
+                                Disponibilité
+                            </span>
                             <span
                                 className={`px-3 py-1 rounded-full text-xs font-semibold inline-block w-28 sm:w-auto text-center ${
                                     book.available

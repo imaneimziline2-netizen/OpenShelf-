@@ -1,10 +1,16 @@
 "use client";
-import { Book } from "@/types/Book";
-import { useParams , useRouter  } from "next/navigation";
+
 import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 
 export default function EditBookPage() {
-    const [book, setBook] = useState<Book | null>(null);
+    const params = useParams();
+    const router = useRouter();
+
+    const id = params.id as string;
+
+    const [loading, setLoading] = useState(true);
+
     const [formData, setFormData] = useState({
         title: "",
         author: "",
@@ -15,50 +21,58 @@ export default function EditBookPage() {
         available: true,
     });
 
-    const params = useParams();
-    const id = params.id as string;
-
-    const router = useRouter();
-
     useEffect(() => {
         async function fetchBook() {
-            const response = await fetch(`/api/books/${id}`);
+            try {
+                const response = await fetch(`/api/books/${id}`);
 
-            const data = await response.json();
+                if (!response.ok) {
+                    alert("Livre introuvable");
+                    router.push("/");
+                    return;
+                }
 
-            if (response.ok) {
-                setBook(data);
+                const data = await response.json();
+
+                setFormData({
+                    title: data.title,
+                    author: data.author,
+                    isbn: data.isbn,
+                    category: data.category,
+                    publicationYear: data.publicationYear.toString(),
+                    description: data.description,
+                    available: data.available,
+                });
+            } catch (error) {
+                console.error(error);
+                alert("Erreur serveur");
+            } finally {
+                setLoading(false);
             }
         }
-        fetchBook();
-    }, [id]);
 
-    useEffect(() => {
-        if (book) {
-            setFormData({
-                title: book.title,
-                author: book.author,
-                isbn: book.isbn,
-                category: book.category,
-                publicationYear: book.publicationYear.toString(),
-                description: book.description,
-                available: book.available,
-            });
-        }
-    }, [book]);
+        fetchBook();
+    }, [id, router]);
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >,
     ) => {
-        const { name, value } = e.target;
+        const { name, value, type } = e.target;
 
         setFormData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]:
+                type === "checkbox"
+                    ? (e.target as HTMLInputElement).checked
+                    : value,
         }));
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (
+        e: React.FormEvent<HTMLFormElement>,
+    ) => {
         e.preventDefault();
 
         try {
@@ -81,6 +95,7 @@ export default function EditBookPage() {
             }
 
             alert("Livre modifié avec succès");
+
             router.push(`/books/${id}`);
         } catch (error) {
             console.error(error);
@@ -88,16 +103,29 @@ export default function EditBookPage() {
         }
     };
 
+    if (loading) {
+        return (
+            <p className="mt-20 text-center text-lg">
+                Chargement...
+            </p>
+        );
+    }
+
     return (
         <section className="mx-auto max-w-3xl px-6 py-10 pt-25">
-            <h1 className="mb-6 text-3xl font-bold">Modifier un livre</h1>
+            <h1 className="mb-6 text-3xl font-bold">
+                Modifier un livre
+            </h1>
 
             <form
-                className="space-y-5 rounded-lg bg-white p-6 shadow"
                 onSubmit={handleSubmit}
+                className="space-y-5 rounded-lg bg-white p-6 shadow"
             >
                 <div>
-                    <label className="mb-2 block font-medium">Titre</label>
+                    <label className="mb-2 block font-medium">
+                        Titre
+                    </label>
+
                     <input
                         type="text"
                         name="title"
@@ -108,7 +136,10 @@ export default function EditBookPage() {
                 </div>
 
                 <div>
-                    <label className="mb-2 block font-medium">Auteur</label>
+                    <label className="mb-2 block font-medium">
+                        Auteur
+                    </label>
+
                     <input
                         type="text"
                         name="author"
@@ -119,7 +150,10 @@ export default function EditBookPage() {
                 </div>
 
                 <div>
-                    <label className="mb-2 block font-medium">ISBN</label>
+                    <label className="mb-2 block font-medium">
+                        ISBN
+                    </label>
+
                     <input
                         type="text"
                         name="isbn"
@@ -130,7 +164,10 @@ export default function EditBookPage() {
                 </div>
 
                 <div>
-                    <label className="mb-2 block font-medium">Catégorie</label>
+                    <label className="mb-2 block font-medium">
+                        Catégorie
+                    </label>
+
                     <input
                         type="text"
                         name="category"
@@ -141,7 +178,10 @@ export default function EditBookPage() {
                 </div>
 
                 <div>
-                    <label className="mb-2 block font-medium">Année</label>
+                    <label className="mb-2 block font-medium">
+                        Année
+                    </label>
+
                     <input
                         type="number"
                         name="publicationYear"
@@ -155,6 +195,7 @@ export default function EditBookPage() {
                     <label className="mb-2 block font-medium">
                         Description
                     </label>
+
                     <textarea
                         name="description"
                         rows={5}
@@ -162,6 +203,17 @@ export default function EditBookPage() {
                         onChange={handleChange}
                         className="w-full rounded-lg border p-3"
                     />
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        name="available"
+                        checked={formData.available}
+                        onChange={handleChange}
+                    />
+
+                    <label>Disponible</label>
                 </div>
 
                 <button
