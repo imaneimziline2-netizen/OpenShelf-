@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function EditBookPage() {
     const params = useParams();
@@ -70,9 +71,7 @@ export default function EditBookPage() {
         }));
     };
 
-    const handleSubmit = async (
-        e: React.FormEvent<HTMLFormElement>,
-    ) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         try {
@@ -104,26 +103,31 @@ export default function EditBookPage() {
     };
 
     if (loading) {
-        return (
-            <p className="mt-20 text-center text-lg">
-                Chargement...
-            </p>
-        );
+        return <p className="mt-20 text-center text-lg">Chargement...</p>;
     }
 
     return (
-        <section className="mx-auto max-w-3xl px-6 py-10 pt-25">
-            <h1 className="mb-6 text-3xl font-bold">
-                Modifier un livre
+        <main className="mx-auto max-w-4xl px-6 py-10 pt-24">
+            <Link href="/" className="text-sm text-gray-500 hover:text-black">
+                ← Retour au catalogue
+            </Link>
+
+            <h1 className="mt-4 text-5xl font-serif font-bold">
+                Modifier le livre
             </h1>
+
+            <p className="mt-2 text-gray-500">
+                Mettez à jour les informations de l ouvrage dans l archive
+                numérique.
+            </p>
 
             <form
                 onSubmit={handleSubmit}
-                className="space-y-5 rounded-lg bg-white p-6 shadow"
+                className="mt-8 rounded-md border border-gray-200 bg-white p-8"
             >
                 <div>
-                    <label className="mb-2 block font-medium">
-                        Titre
+                    <label className="mb-2 block text-sm font-medium">
+                        Titre de l ouvrage
                     </label>
 
                     <input
@@ -131,98 +135,108 @@ export default function EditBookPage() {
                         name="title"
                         value={formData.title}
                         onChange={handleChange}
-                        className="w-full rounded-lg border p-3"
+                        className="w-full rounded border border-gray-300 px-4 py-3 outline-none focus:border-black"
                     />
                 </div>
 
-                <div>
-                    <label className="mb-2 block font-medium">
-                        Auteur
-                    </label>
+                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">
+                            Auteur
+                        </label>
 
-                    <input
-                        type="text"
-                        name="author"
-                        value={formData.author}
-                        onChange={handleChange}
-                        className="w-full rounded-lg border p-3"
-                    />
+                        <input
+                            type="text"
+                            name="author"
+                            value={formData.author}
+                            onChange={handleChange}
+                            className="w-full rounded border border-gray-300 px-4 py-3 outline-none focus:border-black"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">
+                            ISBN
+                        </label>
+
+                        <input
+                            type="text"
+                            name="isbn"
+                            value={formData.isbn}
+                            onChange={handleChange}
+                            className="w-full rounded border border-gray-300 px-4 py-3 outline-none focus:border-black"
+                        />
+                    </div>
                 </div>
 
-                <div>
-                    <label className="mb-2 block font-medium">
-                        ISBN
-                    </label>
+                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">
+                            Genre / Catégorie
+                        </label>
 
-                    <input
-                        type="text"
-                        name="isbn"
-                        value={formData.isbn}
-                        onChange={handleChange}
-                        className="w-full rounded-lg border p-3"
-                    />
+                        <select
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            className="w-full rounded border border-gray-300 px-4 py-3 outline-none focus:border-black"
+                        >
+                            <option value="Roman">Roman</option>
+                            <option value="Science">Science</option>
+                            <option value="Histoire">Histoire</option>
+                            <option value="Informatique">Informatique</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">
+                            Année de publication
+                        </label>
+
+                        <input
+                            type="number"
+                            name="publicationYear"
+                            value={formData.publicationYear}
+                            onChange={handleChange}
+                            className="w-full rounded border border-gray-300 px-4 py-3 outline-none focus:border-black"
+                        />
+                    </div>
                 </div>
 
-                <div>
-                    <label className="mb-2 block font-medium">
-                        Catégorie
-                    </label>
-
-                    <input
-                        type="text"
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        className="w-full rounded-lg border p-3"
-                    />
-                </div>
-
-                <div>
-                    <label className="mb-2 block font-medium">
-                        Année
-                    </label>
-
-                    <input
-                        type="number"
-                        name="publicationYear"
-                        value={formData.publicationYear}
-                        onChange={handleChange}
-                        className="w-full rounded-lg border p-3"
-                    />
-                </div>
-
-                <div>
-                    <label className="mb-2 block font-medium">
-                        Description
+                <div className="mt-6">
+                    <label className="mb-2 block text-sm font-medium">
+                        Synopsis & Notes
                     </label>
 
                     <textarea
                         name="description"
-                        rows={5}
+                        rows={7}
                         value={formData.description}
                         onChange={handleChange}
-                        className="w-full rounded-lg border p-3"
-                    />
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        name="available"
-                        checked={formData.available}
-                        onChange={handleChange}
+                        className="w-full resize-none rounded border border-gray-300 p-4 outline-none focus:border-black"
                     />
 
-                    <label>Disponible</label>
+                    <p className="mt-2 text-right text-xs text-gray-400">
+                        {formData.description.length} / 1000 caractères
+                    </p>
                 </div>
 
-                <button
-                    type="submit"
-                    className="rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
-                >
-                    Enregistrer les modifications
-                </button>
+                <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <button
+                        type="submit"
+                        className="rounded bg-slate-900 px-8 py-3 text-white transition hover:bg-slate-800"
+                    >
+                        Mettre à jour
+                    </button>
+
+                    <Link
+                        href={`/books/${id}`}
+                        className="text-sm text-gray-500 underline hover:text-black"
+                    >
+                        Annuler les modifications
+                    </Link>
+                </div>
             </form>
-        </section>
+        </main>
     );
 }

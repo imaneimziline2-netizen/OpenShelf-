@@ -111,7 +111,7 @@ export default function BookDetails({ params }: PageProps) {
                                 ISBN
                             </span>
                             <span className="font-medium text-sm sm:text-base break-all text-right ml-2">
-                                {book.isbn}
+                                {book?.isbn}
                             </span>
                         </div>
 
@@ -120,7 +120,7 @@ export default function BookDetails({ params }: PageProps) {
                                 Année
                             </span>
                             <span className="font-medium text-sm sm:text-base">
-                                {book.publicationYear}
+                                {book?.publicationYear}
                             </span>
                         </div>
 
@@ -129,7 +129,7 @@ export default function BookDetails({ params }: PageProps) {
                                 Catégorie
                             </span>
                             <span className="font-medium text-sm sm:text-base">
-                                {book.category}
+                                {book?.category}
                             </span>
                         </div>
 
@@ -139,12 +139,12 @@ export default function BookDetails({ params }: PageProps) {
                             </span>
                             <span
                                 className={`px-3 py-1 rounded-full text-xs font-semibold inline-block w-28 sm:w-auto text-center ${
-                                    book.available
+                                    book?.available
                                         ? "bg-green-100 text-green-700"
                                         : "bg-red-100 text-red-700"
                                 }`}
                             >
-                                {book.available ? "Disponible" : "Emprunté"}
+                                {book?.available ? "Disponible" : "Emprunté"}
                             </span>
                         </div>
                     </div>
@@ -154,22 +154,22 @@ export default function BookDetails({ params }: PageProps) {
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0">
                         <div>
                             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold">
-                                {book.title}
+                                {book?.title}
                             </h1>
 
                             <p className="mt-2 text-xl sm:text-2xl italic text-gray-500">
-                                {book.author}
+                                {book?.author}
                             </p>
                         </div>
 
                         <span
                             className={`px-4 py-2 rounded-full text-sm font-medium inline-block w-full sm:w-auto text-center ${
-                                book.available
+                                book?.available
                                     ? "bg-green-100 text-green-700"
                                     : "bg-red-100 text-red-700"
                             }`}
                         >
-                            {book.available ? "🟢 Disponible" : "🔴 Emprunté"}
+                            {book?.available ? "🟢 Disponible" : "🔴 Emprunté"}
                         </span>
                     </div>
 
@@ -180,14 +180,14 @@ export default function BookDetails({ params }: PageProps) {
                     </h2>
 
                     <p className="text-gray-700 leading-6 sm:leading-8 text-justify text-sm sm:text-base">
-                        {book.description}
+                        {book?.description}
                     </p>
 
                     <hr className="my-6 sm:my-8" />
 
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                         <Link
-                            href={`/books/edit/${book._id}`}
+                            href={`/books/edit/${book?._id}`}
                             className="bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition text-center text-sm sm:text-base"
                         >
                             Modifier
